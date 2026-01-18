@@ -1,15 +1,15 @@
 const mongoose = require("mongoose")
 
 const bookingSchema = new mongoose.Schema({
-  movieId: String,
-  movieTitle: String,
-  userEmail: String,
-  seats: [String],
-  seatType: String,
+  userId: mongoose.Schema.Types.ObjectId,
+  movieId: mongoose.Schema.Types.ObjectId,
+  category: String,
+  seats: Number,
   totalPrice: Number,
-  bookingDate: {
-    type: Date,
-    default: Date.now
+  status: {
+    type: String,
+    enum: ["CONFIRMED"],
+    default: "CONFIRMED"
   }
 })
 
