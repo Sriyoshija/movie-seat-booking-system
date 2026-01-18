@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Seat Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .test-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎫 Login</h1>
+        <p class="subtitle">Welcome to Seat Booking System</p>
+
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="signup.html">Sign up here</a>
+        </div>
+
+        <div class="test-accounts">
+            <strong>Test Accounts:</strong><br>
+            Username: <code>admin</code> / Password: <code>admin123</code><br>
+            Username: <code>user</code> / Password: <code>user123</code>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize default data
+        if (!localStorage.getItem('users')) {
+            const defaultUsers = [
+                { username: 'admin', password: 'admin123', email: 'admin@example.com', name: 'Admin User', isAdmin: true },
+                { username: 'user', password: 'user123', email: 'user@example.com', name: 'Test User', isAdmin: false }
+            ];
+            localStorage.setItem('users', JSON.stringify(defaultUsers));
+        }
+
+        if (!localStorage.getItem('movies')) {
+            const defaultMovies = [
+                { id: 1, title: 'Avengers: Endgame', description: 'The epic conclusion to the Infinity Saga', duration: '3h 1m', genre: 'Action, Adventure', imageUrl: 'https://via.placeholder.com/300x400?text=Avengers' },
+                { id: 2, title: 'The Dark Knight', description: 'Batman faces his greatest challenge', duration: '2h 32m', genre: 'Action, Crime, Drama', imageUrl: 'https://via.placeholder.com/300x400?text=Dark+Knight' },
+                { id: 3, title: 'Inception', description: 'A mind-bending thriller about dreams', duration: '2h 28m', genre: 'Sci-Fi, Thriller', imageUrl: 'https://via.placeholder.com/300x400?text=Inception' },
+                { id: 4, title: 'Interstellar', description: 'A journey beyond our solar system', duration: '2h 49m', genre: 'Sci-Fi, Drama', imageUrl: 'https://via.placeholder.com/300x400?text=Interstellar' },
+                { id: 5, title: 'The Matrix', description: 'A computer hacker learns about the true nature of reality', duration: '2h 16m', genre: 'Action, Sci-Fi', imageUrl: 'https://via.placeholder.com/300x400?text=Matrix' }
+            ];
+            localStorage.setItem('movies', JSON.stringify(defaultMovies));
+            localStorage.setItem('nextMovieId', '6');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                window.location.href = 'movies.html';
+            } else {
+                showMessage('Invalid username or password!', false);
+            }
+        });
+
+        function showMessage(text, isSuccess) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + (isSuccess ? 'success' : 'error');
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Check for logout message
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('logout') === 'true') {
+            showMessage('You have been logged out successfully!', true);
+        }
+    </script>
+</body>
+</html>
+

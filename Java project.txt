@@ -1,0 +1,3 @@
+In a stadium seat booking system developed using Java, you can solve various problems related to managing and organizing seat reservations for events. Some common problems that can be addressed include:
+
+Efficient seat allocation: Java can be used to create algorithms that efficiently allocate seats based on user preferences, availability, and constraints.

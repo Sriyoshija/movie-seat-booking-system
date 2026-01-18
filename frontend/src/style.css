@@ -1,0 +1,49 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.auth-box {
+  max-width: 300px;
+  margin: 80px auto;
+  padding: 20px;
+  background: white;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.auth-box input,
+.auth-box select,
+.auth-box button {
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  background: #222;
+  color: white;
+}
+
+.header button {
+  margin-left: 10px;
+}
+
+.add-movie {
+  background: white;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 8px;
+}
+
+.add-movie input,
+.add-movie textarea,
+.add-movie button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}

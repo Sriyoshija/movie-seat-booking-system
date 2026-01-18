@@ -1,0 +1,30 @@
+.payment-container {
+max-width: 500px;
+margin: auto;
+text-align: center;
+}
+
+.payment-options {
+display: flex;
+justify-content: space-around;
+margin: 20px 0;
+}
+
+.upi-box img {
+width: 200px;
+margin: 10px 0;
+}
+
+.pay-btn {
+margin-top: 20px;
+padding: 10px 25px;
+background: #27ae60;
+color: white;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+}
+
+.pay-btn:hover {
+background: #219150;
+}

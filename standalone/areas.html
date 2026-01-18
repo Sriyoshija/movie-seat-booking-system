@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Area & Showtime - Seat Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Select Area & Showtime</h1>
+        <a href="movies.html" class="btn btn-secondary">← Back to Movies</a>
+    </div>
+
+    <div class="container">
+        <div id="movieInfo" class="movie-info" style="background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center;"></div>
+
+        <form id="areaForm">
+            <div class="section" style="margin-bottom: 40px;">
+                <h2 class="section-title" style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea;">Select Area</h2>
+                <div class="options-grid" id="areasGrid"></div>
+            </div>
+
+            <div class="section" style="margin-bottom: 40px;">
+                <h2 class="section-title" style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea;">Select Showtime</h2>
+                <div class="options-grid" id="showtimesGrid"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="continueBtn" disabled style="width: 100%; padding: 16px; font-size: 1.1em;">Continue to Seat Selection</button>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if (!requireAuth()) return;
+
+        const movieId = getSessionData('selectedMovieId');
+        if (!movieId) {
+            window.location.href = 'movies.html';
+            return;
+        }
+
+        const movies = getMovies();
+        const movie = movies.find(m => m.id == movieId);
+        if (movie) {
+            document.getElementById('movieInfo').innerHTML = `
+                <div style="font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 10px;">${movie.title}</div>
+                <div style="color: #666;">${movie.duration} • ${movie.genre}</div>
+            `;
+        }
+
+        const areas = ['Standard', 'Premium', 'VIP', 'Recliner'];
+        const showtimes = ['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM', '10:00 PM'];
+
+        const areasGrid = document.getElementById('areasGrid');
+        areas.forEach(area => {
+            const label = document.createElement('label');
+            label.className = 'option-card';
+            label.innerHTML = `
+                <input type="radio" name="area" value="${area}" required>
+                <div class="option-name">${area}</div>
+                <div class="option-desc">${getAreaDescription(area)}</div>
+            `;
+            label.addEventListener('click', function() {
+                document.querySelectorAll('input[name="area"]').forEach(inp => {
+                    inp.closest('.option-card').classList.remove('selected');
+                });
+                if (label.querySelector('input').checked) {
+                    label.classList.add('selected');
+                }
+                checkForm();
+            });
+            areasGrid.appendChild(label);
+        });
+
+        const showtimesGrid = document.getElementById('showtimesGrid');
+        showtimes.forEach(showtime => {
+            const label = document.createElement('label');
+            label.className = 'option-card';
+            label.innerHTML = `
+                <input type="radio" name="showtime" value="${showtime}" required>
+                <div class="option-name">${showtime}</div>
+            `;
+            label.addEventListener('click', function() {
+                document.querySelectorAll('input[name="showtime"]').forEach(inp => {
+                    inp.closest('.option-card').classList.remove('selected');
+                });
+                if (label.querySelector('input').checked) {
+                    label.classList.add('selected');
+                }
+                checkForm();
+            });
+            showtimesGrid.appendChild(label);
+        });
+
+        function getAreaDescription(area) {
+            const descs = {
+                'Standard': 'Regular seating',
+                'Premium': 'Enhanced comfort',
+                'VIP': 'Luxury experience',
+                'Recliner': 'Reclining seats'
+            };
+            return descs[area] || '';
+        }
+
+        function checkForm() {
+            const areaSelected = document.querySelector('input[name="area"]:checked');
+            const showtimeSelected = document.querySelector('input[name="showtime"]:checked');
+            document.getElementById('continueBtn').disabled = !(areaSelected && showtimeSelected);
+        }
+
+        document.getElementById('areaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const area = document.querySelector('input[name="area"]:checked').value;
+            const showtime = document.querySelector('input[name="showtime"]:checked').value;
+            setSessionData('selectedArea', area);
+            setSessionData('selectedShowtime', showtime);
+            window.location.href = 'seats.html';
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,48 @@
+.container {
+max-width: 750px;
+margin: auto;
+text-align: center;
+}
+
+.legend {
+display: flex;
+justify-content: space-around;
+margin: 15px 0;
+font-weight: bold;
+}
+
+.seats {
+display: grid;
+grid-template-columns: repeat(8, 1fr);
+gap: 10px;
+margin: 20px 0;
+}
+
+.seat {
+padding: 10px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+color: black;
+}
+
+.seat.selected {
+outline: 3px solid black;
+}
+
+/* Seat Types */
+.regular {
+background: #dcdcdc;
+}
+
+.premium {
+background: #6fa8dc;
+}
+
+.vip {
+background: #ffd966;
+}
+
+.summary {
+margin-top: 20px;
+}

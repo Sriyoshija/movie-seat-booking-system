@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Movie - Seat Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 Select a Movie</h1>
+        <div class="user-info">
+            <span id="welcomeText"></span>
+            <a id="adminBtn" href="admin.html" class="btn admin-btn" style="display: none;">Admin Panel</a>
+            <a href="index.html?logout=true" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <p style="text-align: center; color: #666; font-size: 1.1em; margin-bottom: 20px;">
+            Choose a movie to book seats for
+        </p>
+
+        <div class="movies-grid" id="moviesGrid"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if (!requireAuth()) return;
+
+        const user = getCurrentUser();
+        document.getElementById('welcomeText').textContent = `Welcome, ${user.name}!`;
+        
+        if (isAdmin()) {
+            document.getElementById('adminBtn').style.display = 'inline-block';
+        }
+
+        const movies = getMovies();
+        const grid = document.getElementById('moviesGrid');
+        
+        movies.forEach(movie => {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.innerHTML = `
+                <div class="movie-image">${movie.title}</div>
+                <div class="movie-info">
+                    <div class="movie-title">${movie.title}</div>
+                    <div class="movie-details">
+                        <strong>Duration:</strong> ${movie.duration}
+                    </div>
+                    <div class="movie-details">
+                        <strong>Genre:</strong> ${movie.genre}
+                    </div>
+                    <div class="movie-description">${movie.description}</div>
+                    <button class="select-btn" onclick="selectMovie(${movie.id})">Select Movie</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        function selectMovie(movieId) {
+            setSessionData('selectedMovieId', movieId);
+            window.location.href = 'areas.html';
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Area & Showtime - Seat Booking System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #555;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        .movie-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .movie-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .movie-details {
+            color: #666;
+        }
+
+        .selection-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-3px);
+        }
+
+        .option-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .option-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .option-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .continue-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Select Area & Showtime</h1>
+        <a href="/movies" class="back-btn">← Back to Movies</a>
+    </div>
+
+    <div class="container">
+        <div class="movie-info" th:if="${selectedMovie}">
+            <div class="movie-title" th:text="${selectedMovie.title}"></div>
+            <div class="movie-details">
+                <span th:text="${selectedMovie.duration}"></span> • 
+                <span th:text="${selectedMovie.genre}"></span>
+            </div>
+        </div>
+
+        <form method="post" action="/select-area" id="areaForm">
+            <div class="selection-section">
+                <div class="section-title">Select Area</div>
+                <div class="options-grid">
+                    <label th:each="area : ${areas}" class="option-card">
+                        <input type="radio" name="area" th:value="${area}" required>
+                        <div class="option-name" th:text="${area}"></div>
+                        <div class="option-desc" th:switch="${area}">
+                            <span th:case="'Standard'">Regular seating</span>
+                            <span th:case="'Premium'">Enhanced comfort</span>
+                            <span th:case="'VIP'">Luxury experience</span>
+                            <span th:case="'Recliner'">Reclining seats</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="selection-section">
+                <div class="section-title">Select Showtime</div>
+                <div class="options-grid">
+                    <label th:each="showtime : ${showtimes}" class="option-card">
+                        <input type="radio" name="showtime" th:value="${showtime}" required>
+                        <div class="option-name" th:text="${showtime}"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="continue-btn" id="continueBtn" disabled>Continue to Seat Selection</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('areaForm');
+        const continueBtn = document.getElementById('continueBtn');
+        const areaInputs = document.querySelectorAll('input[name="area"]');
+        const showtimeInputs = document.querySelectorAll('input[name="showtime"]');
+
+        function checkForm() {
+            const areaSelected = Array.from(areaInputs).some(input => input.checked);
+            const showtimeSelected = Array.from(showtimeInputs).some(input => input.checked);
+            continueBtn.disabled = !(areaSelected && showtimeSelected);
+        }
+
+        areaInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                document.querySelectorAll('input[name="area"]').forEach(inp => {
+                    inp.closest('.option-card').classList.remove('selected');
+                });
+                if (input.checked) {
+                    input.closest('.option-card').classList.add('selected');
+                }
+                checkForm();
+            });
+        });
+
+        showtimeInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                document.querySelectorAll('input[name="showtime"]').forEach(inp => {
+                    inp.closest('.option-card').classList.remove('selected');
+                });
+                if (input.checked) {
+                    input.closest('.option-card').classList.add('selected');
+                }
+                checkForm();
+            });
+        });
+    </script>
+</body>
+</html>
+

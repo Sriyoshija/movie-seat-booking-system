@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seats - Seat Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div id="bookingInfo"></div>
+            <div>
+                <a href="areas.html" class="btn btn-secondary">← Back</a>
+                <a href="index.html?logout=true" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="screen">🎬 SCREEN</div>
+        
+        <div id="pricingInfo" class="pricing-info"></div>
+        
+        <div id="message" class="message"></div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label>Row:</label>
+                <input type="number" id="rowInput" min="1" max="10" value="1">
+            </div>
+            <div class="input-group">
+                <label>Seat:</label>
+                <input type="number" id="seatInput" min="1" max="10" value="1">
+            </div>
+            <button class="btn btn-primary" style="background: #4CAF50;" onclick="bookSeat()">Book Seat</button>
+            <button class="btn btn-primary" style="background: #f44336;" onclick="cancelSeat()">Cancel Booking</button>
+            <button class="btn btn-primary" style="background: #2196F3;" onclick="loadSeats()">Refresh</button>
+            <button class="btn btn-primary" style="background: #FF9800;" onclick="confirmBooking()">Confirm Booking & Send Email</button>
+        </div>
+
+        <div class="seat-map" id="seatMap"></div>
+
+        <div id="selectedSeatsDiv" class="selected-seats" style="display: none;"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box available"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box booked"></div>
+                <span>Booked</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if (!requireAuth()) return;
+
+        let seatSize = 10;
+        let pricePerSeat = 10;
+        let selectedSeats = [];
+        const user = getCurrentUser();
+        const movieId = parseInt(getSessionData('selectedMovieId'));
+        const area = getSessionData('selectedArea');
+        const showtime = getSessionData('selectedShowtime');
+
+        if (!movieId || !area || !showtime) {
+            window.location.href = 'movies.html';
+            return;
+        }
+
+        const movies = getMovies();
+        const movie = movies.find(m => m.id == movieId);
+        if (movie) {
+            document.getElementById('bookingInfo').innerHTML = `
+                <div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #333; margin-bottom: 8px;">${movie.title}</div>
+                    <div style="color: #666;">${area} • ${showtime}</div>
+                </div>
+            `;
+        }
+
+        pricePerSeat = getAreaPrice(area);
+        seatSize = getAreaSize(area);
+        document.getElementById('pricingInfo').textContent = 
+            `Price per seat: $${pricePerSeat} | Area: ${area} | Total Seats: ${seatSize} x ${seatSize}`;
+
+        function loadSeats() {
+            const seats = getSeats(movieId, area, showtime);
+            const seatMap = document.getElementById('seatMap');
+            seatMap.style.gridTemplateColumns = `repeat(${seatSize}, 1fr)`;
+            seatMap.innerHTML = '';
+            
+            for (let row = 0; row < seatSize; row++) {
+                for (let seat = 0; seat < seatSize; seat++) {
+                    const seatDiv = document.createElement('div');
+                    const isBooked = seats[row][seat];
+                    seatDiv.className = 'seat ' + (isBooked ? 'booked' : 'available');
+                    seatDiv.innerHTML = `
+                        <span class="seat-label">${row + 1}-${seat + 1}</span>
+                        ${isBooked ? '✗' : '✓'}
+                    `;
+                    if (!isBooked) {
+                        seatDiv.onclick = () => {
+                            document.getElementById('rowInput').value = row + 1;
+                            document.getElementById('seatInput').value = seat + 1;
+                        };
+                    }
+                    seatMap.appendChild(seatDiv);
+                }
+            }
+            
+            document.getElementById('rowInput').max = seatSize;
+            document.getElementById('seatInput').max = seatSize;
+        }
+
+        function bookSeat() {
+            const row = parseInt(document.getElementById('rowInput').value);
+            const seat = parseInt(document.getElementById('seatInput').value);
+            const result = bookSeat(movieId, area, showtime, row, seat);
+            showMessage(result.message, result.success);
+            if (result.success) {
+                selectedSeats.push({row: row, seat: seat});
+                updateSelectedSeats();
+                loadSeats();
+            }
+        }
+
+        function cancelSeat() {
+            const row = parseInt(document.getElementById('rowInput').value);
+            const seat = parseInt(document.getElementById('seatInput').value);
+            const result = cancelSeat(movieId, area, showtime, row, seat);
+            showMessage(result.message, result.success);
+            if (result.success) {
+                selectedSeats = selectedSeats.filter(s => !(s.row === row && s.seat === seat));
+                updateSelectedSeats();
+                loadSeats();
+            }
+        }
+
+        function updateSelectedSeats() {
+            const div = document.getElementById('selectedSeatsDiv');
+            if (selectedSeats.length === 0) {
+                div.style.display = 'none';
+                return;
+            }
+            div.style.display = 'block';
+            const totalPrice = selectedSeats.length * pricePerSeat;
+            div.innerHTML = `
+                <h3>Selected Seats (${selectedSeats.length})</h3>
+                <p>Seats: ${selectedSeats.map(s => `Row ${s.row}, Seat ${s.seat}`).join('; ')}</p>
+                <p><strong>Total Price: $${totalPrice.toFixed(2)}</strong></p>
+            `;
+        }
+
+        function confirmBooking() {
+            if (selectedSeats.length === 0) {
+                showMessage('Please select at least one seat before confirming.', false);
+                return;
+            }
+
+            const booking = {
+                bookingId: Math.random().toString(36).substring(2, 10).toUpperCase(),
+                user: user,
+                movie: movie,
+                area: area,
+                showtime: showtime,
+                seats: selectedSeats,
+                totalPrice: selectedSeats.length * pricePerSeat
+            };
+
+            const emailContent = sendBookingEmail(booking);
+            
+            // Show email content in alert
+            alert(`Booking Confirmed!\n\nBooking ID: ${booking.bookingId}\n\nEmail sent to: ${user.email}\n\n${emailContent}`);
+            
+            showMessage(`Booking confirmed! Confirmation email sent to ${user.email}`, true);
+            selectedSeats = [];
+            updateSelectedSeats();
+            loadSeats();
+        }
+
+        function showMessage(text, isSuccess) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + (isSuccess ? 'success' : 'error');
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        loadSeats();
+        setInterval(loadSeats, 5000);
+    </script>
+</body>
+</html>
+
