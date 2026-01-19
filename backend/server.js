@@ -5,9 +5,9 @@ const cors = require("cors")
 
 dotenv.config()
 
-const authRoutes = require("./routes/authRoutes.js")
-const movieRoutes = require("./routes/movieRoutes.js")
-const bookingRoutes = require("./routes/bookingRoutes.js")
+const authRoutes = require("./routes/authRoutes")
+const movieRoutes = require("./routes/movieRoutes")
+const bookingRoutes = require("./routes/bookingRoutes")
 
 const app = express()
 
@@ -18,15 +18,18 @@ app.use("/api/auth", authRoutes)
 app.use("/api/movies", movieRoutes)
 app.use("/api/bookings", bookingRoutes)
 
+const PORT = process.env.PORT || 5000
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected")
+
     const PORT = process.env.PORT || 5000
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
-
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`)
+    })
   })
-  .catch(err => console.log(err))
+  .catch(err => {
+    console.error("MongoDB connection error:", err)
+  })

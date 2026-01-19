@@ -8,22 +8,17 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-const sendEmail = async (to, booking, movie) => {
+module.exports = async (to, booking, movie) => {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
-    subject: "🎬 Movie Seat Booking Confirmation",
+    subject: "🎬 Movie Booking Confirmation",
     html: `
-      <h2>Booking Confirmed!</h2>
-      <p><b>Movie:</b> ${movie.title}</p>
-      <p><b>Show Time:</b> ${movie.showTime}</p>
-      <p><b>Category:</b> ${booking.category}</p>
-      <p><b>Seats:</b> ${booking.seats}</p>
-      <p><b>Total Amount:</b> ₹${booking.totalPrice}</p>
-      <br/>
-      <p>Enjoy your movie 🍿</p>
+      <h3>Booking Confirmed</h3>
+      <p>Movie: ${movie.title}</p>
+      <p>Category: ${booking.category}</p>
+      <p>Seats: ${booking.seats}</p>
+      <p>Total: ₹${booking.totalPrice}</p>
     `
   })
 }
-
-module.exports = sendEmail

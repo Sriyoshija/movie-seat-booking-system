@@ -6,10 +6,9 @@ const bookingSchema = new mongoose.Schema({
   category: String,
   seats: Number,
   totalPrice: Number,
-  status: {
-    type: String,
-    enum: ["CONFIRMED"],
-    default: "CONFIRMED"
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 })
 
