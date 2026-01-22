@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-/*
-  TEMP in-memory seat data
-  (For college project this is perfectly OK)
-*/
+// TEMP SEAT DATA
 const seats = [];
 
 for (let row = 1; row <= 5; row++) {
@@ -17,19 +14,12 @@ for (let row = 1; row <= 5; row++) {
   }
 }
 
-/*
-  GET all seats
-  URL: /api/bookings/seats
-*/
+// GET SEATS
 router.get("/seats", (req, res) => {
   res.json(seats);
 });
 
-/*
-  BOOK a seat
-  URL: /api/bookings/book
-  Body: { "row": 1, "seat": 2 }
-*/
+// BOOK SEAT
 router.post("/book", (req, res) => {
   const { row, seat } = req.body;
 
@@ -46,14 +36,10 @@ router.post("/book", (req, res) => {
   }
 
   seatObj.booked = true;
-
   res.json({ message: "Seat booked successfully" });
 });
 
-/*
-  CANCEL booking
-  URL: /api/bookings/cancel
-*/
+// CANCEL SEAT
 router.post("/cancel", (req, res) => {
   const { row, seat } = req.body;
 
@@ -66,7 +52,6 @@ router.post("/cancel", (req, res) => {
   }
 
   seatObj.booked = false;
-
   res.json({ message: "Booking cancelled" });
 });
 
