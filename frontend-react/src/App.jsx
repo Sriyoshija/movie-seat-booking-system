@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Admin from "./Admin";
+import AdminRoute from "./AdminRoute";
 import Login from "./Login";
 import Navbar from "./Navbar";
 import RequireAuth from "./RequireAuth";
@@ -19,8 +21,18 @@ function App() {
             </RequireAuth>
           }
         />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

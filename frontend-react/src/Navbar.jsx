@@ -3,34 +3,29 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  console.log("NAVBAR ROLE:", role); // DEBUG
+
+  const logout = () => {
+    localStorage.clear();
     navigate("/login");
   };
 
   return (
-    <nav style={{ marginBottom: "20px" }}>
-      <Link to="/">Seats</Link> |{" "}
-      {!token && <Link to="/login">Login</Link>} |{" "}
-      {!token && <Link to="/signup">Signup</Link>}
-      {token && (
+    <nav>
+      <Link to="/">Seats</Link>
+
+      {role === "admin" && (
         <>
           {" | "}
-          <button
-            onClick={handleLogout}
-            style={{
-              background: "red",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              cursor: "pointer"
-            }}
-          >
-            Logout
-          </button>
+          <Link to="/admin">Admin</Link>
         </>
       )}
+
+      {!token && <> | <Link to="/login">Login</Link></>}
+      {!token && <> | <Link to="/signup">Signup</Link></>}
+      {token && <> | <button onClick={logout}>Logout</button></>}
     </nav>
   );
 }

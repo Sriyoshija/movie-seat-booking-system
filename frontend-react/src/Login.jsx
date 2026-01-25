@@ -7,29 +7,28 @@ const API_BASE_URL =
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        setMessage(data.message || "Login failed");
-        return;
-      }
+    console.log("LOGIN RESPONSE:", data); // DEBUG LINE
 
-      localStorage.setItem("token", data.token);
-      navigate("/");
-    } catch {
-      setMessage("Server error");
+    if (!res.ok) {
+      alert(data.message);
+      return;
     }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role); // 🔴 CRITICAL
+
+    navigate("/");
   };
 
   return (
@@ -52,7 +51,6 @@ function Login() {
       <br />
 
       <button onClick={handleLogin}>Login</button>
-      {message && <p>{message}</p>}
     </div>
   );
 }
