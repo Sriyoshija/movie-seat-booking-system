@@ -9,8 +9,8 @@ router.post("/signup", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const exists = await User.findOne({ username });
-    if (exists) {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -22,7 +22,6 @@ router.post("/signup", async (req, res) => {
 
     res.json({ message: "Signup successful" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -41,15 +40,21 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    // 🔴 IMPORTANT: INCLUDE ROLE IN JWT + RESPONSE
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      {
+        id: user._id,
+        role: user.role
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+    res.json({
+      token: token,
+      role: user.role  
+    });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
